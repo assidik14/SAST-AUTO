@@ -1,0 +1,61 @@
+services:
+
+  nginx:
+    container_name: nginx-proxy
+    image: assidik14/nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ~/Data/DockerVolume/SAST-AUTO/data/nginx/content:/usr/share/nginx/html
+      - ~/Data/DockerVolume/SAST-AUTO/data/nginx/sites-available:/etc/nginx/sites-available
+      - ~/Data/DockerVolume/SAST-AUTO/data/nginx/sites-enabled:/etc/nginx/sites-enabled
+      - ~/Data/DockerVolume/SAST-AUTO/data/nginx/ssl:/etc/nginx/ssl
+    restart: always
+    networks:
+      env-network:
+        ipv4_address: 10.10.10.10
+
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ~/Data/DockerVolume/SAST-AUTO/data/portainer/data:/data
+    restart: always
+    networks:
+      env-network:
+        ipv4_address: 10.10.10.5
+
+  sonarqube:
+    container_name: sonarqube
+    image: sonarqube:lts-community
+    volumes:
+      - ~/Data/DockerVolume/SAST-AUTO/data/sonarqube/data:/opt/sonarqube/data
+      - ~/Data/DockerVolume/SAST-AUTO/data/sonarqube/logs:/opt/sonarqube/logs
+      - ~/Data/DockerVolume/SAST-AUTO/data/sonarqube/extensions:/opt/sonarqube/extensions
+    restart: always
+    networks:
+      env-network:
+        ipv4_address: 10.10.10.6
+
+  jenkins:
+    container_name: jenkins
+    image: jenkins/jenkins:lts
+    volumes:
+      - ~/Data/DockerVolume/SAST-AUTO/data/jenkins/home:/var/jenkins_home
+    restart: always
+    networks:
+      env-network:
+        ipv4_address: 10.10.10.7
+
+
+networks:
+  
+  env-network:
+    driver: bridge
+    name: env-network
+    ipam:
+      config:
+        - subnet: 10.10.10.0/24
+          gateway: 10.10.10.1
